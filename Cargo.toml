@@ -6,6 +6,8 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-reqwest = { version = "0.11", features = ["blocking", "json"] }
+reqwest = { version = "0.11", features = ["blocking", "json", "stream"] }
 tokio = { version = "1", features = ["full"] }
 structopt = "0.3.13"
+indicatif = "0.16.2"
+futures-util = "0.3.17"
