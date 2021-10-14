@@ -1,12 +1,12 @@
+use std::fmt;
 use std::fs::File;
 use std::io::Write;
 use std::num::ParseIntError;
 
 use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
-use structopt::StructOpt;
 use regex::Regex;
-use std::fmt;
+use structopt::StructOpt;
 
 struct URLParsingError;
 
@@ -23,12 +23,15 @@ impl fmt::Debug for URLParsingError {
 }
 
 
-fn validate_url(url: &str) -> Result<String, URLParsingError>{
-        let url_regex = Regex::new(r"^https?://.*$").unwrap();
-        match url_regex.is_match(url) {
-            true => return Ok(url.to_string()),
-            false => return Err(URLParsingError)
-        };
+fn validate_url(url: &str) -> Result<String, URLParsingError> {
+    let url_regex = Regex::new(r"^https?://.*$").unwrap();
+
+    let result = match url_regex.is_match(url) {
+        true => Ok(url.to_string()),
+        false => Err(URLParsingError)
+    };
+
+    return result;
 }
 
 #[derive(StructOpt)]
@@ -36,15 +39,13 @@ struct Cli {
     #[structopt(parse(try_from_str = validate_url))]
     url: String,
     #[structopt(parse(from_os_str))]
-    path: std::path::PathBuf
+    path: std::path::PathBuf,
 }
 
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-
     let args = Cli::from_args();
-
 
 
     let response = reqwest::get(args.url)
