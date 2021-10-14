@@ -1,12 +1,39 @@
 use std::fs::File;
 use std::io::Write;
+use std::num::ParseIntError;
 
 use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
 use structopt::StructOpt;
+use regex::Regex;
+use std::fmt;
+
+struct URLParsingError;
+
+impl fmt::Display for URLParsingError {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "URL has invalid format!")
+    }
+}
+
+impl fmt::Debug for URLParsingError {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "{{ file: {}, line: {} }}", file!(), line!())
+    }
+}
+
+
+fn validate_url(url: &str) -> Result<String, URLParsingError>{
+        let url_regex = Regex::new(r"^https?://.*$").unwrap();
+        match url_regex.is_match(url) {
+            true => return Ok(url.to_string()),
+            false => return Err(URLParsingError)
+        };
+}
 
 #[derive(StructOpt)]
 struct Cli {
+    #[structopt(parse(try_from_str = validate_url))]
     url: String,
     #[structopt(parse(from_os_str))]
     path: std::path::PathBuf
@@ -18,7 +45,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let args = Cli::from_args();
 
-    println!("Download from url: {}", args.url);
+
+
     let response = reqwest::get(args.url)
         .await?;
 
@@ -32,7 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut stream = response.bytes_stream();
     println!("Saving file to: {}", &args.path.display());
 
-    let mut file = File::create("foo.txt")?;
+    let mut file = File::create(format!("{}", &args.path.display()))?;
     let bar = ProgressBar::new(total_size);
 
     bar.set_style(ProgressStyle::default_bar()

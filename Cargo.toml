@@ -11,3 +11,4 @@ tokio = { version = "1", features = ["full"] }
 structopt = "0.3.13"
 indicatif = "0.16.2"
 futures-util = "0.3.17"
+regex = "1"
