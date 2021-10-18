@@ -1,5 +1,5 @@
-use std::fmt;
 use regex::Regex;
+use std::fmt;
 use structopt::StructOpt;
 
 struct URLParsingError;
@@ -16,13 +16,12 @@ impl fmt::Debug for URLParsingError {
     }
 }
 
-
 fn validate_url(url: &str) -> Result<String, URLParsingError> {
     let url_regex = Regex::new(r"^https?://.*$").unwrap();
 
     let result = match url_regex.is_match(url) {
         true => Ok(url.to_string()),
-        false => Err(URLParsingError)
+        false => Err(URLParsingError),
     };
 
     return result;
