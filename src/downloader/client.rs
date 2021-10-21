@@ -1,6 +1,5 @@
-use std::fs::File;
-use std::io::Write;
-
+use async_std::fs::File;
+use async_std::io::WriteExt;
 use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
 
@@ -20,7 +19,7 @@ pub async fn download(
     let mut stream = response.bytes_stream();
     println!("Saving file to: {}", &path.display());
 
-    let mut file = File::create(format!("{}", &path.display()))?;
+    let mut file = File::create(format!("{}", &path.display())).await?;
     let bar = ProgressBar::new(total_size);
 
     bar.set_style(ProgressStyle::default_bar()
@@ -33,7 +32,7 @@ pub async fn download(
 
         downloaded_length = downloaded_length + (chunk_data.len() as u64);
 
-        file.write(&chunk_data).or(Err("Chunk writing error"))?;
+        file.write(&chunk_data).await?;
         bar.set_position(downloaded_length);
     }
 
