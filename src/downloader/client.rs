@@ -1,13 +1,17 @@
+use std::env::args;
 use async_std::fs::File;
 use async_std::io::WriteExt;
 use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
 
 pub async fn download(
-    url: String,
+    url: &String,
     path: std::path::PathBuf,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let response = reqwest::get(url).await?;
+
+    let file_name = url.split('/').next_back().unwrap();
+    let final_path = path.join(file_name);
 
     let total_size_option = response.content_length();
 
@@ -19,7 +23,7 @@ pub async fn download(
     let mut stream = response.bytes_stream();
     println!("Saving file to: {}", &path.display());
 
-    let mut file = File::create(format!("{}", &path.display())).await?;
+    let mut file = File::create(format!("{}", &final_path.display())).await?;
     let bar = ProgressBar::new(total_size);
 
     bar.set_style(ProgressStyle::default_bar()
@@ -36,6 +40,6 @@ pub async fn download(
         bar.set_position(downloaded_length);
     }
 
-    bar.finish_with_message(format!("File saved under {} 📦", &path.display()));
+    bar.finish_with_message(format!("File saved under {} 📦", &final_path.display()));
     Ok(())
 }
