@@ -2,7 +2,7 @@ use std::env::args;
 
 use async_std::fs::File;
 use async_std::io::WriteExt;
-use futures_util::StreamExt;
+use futures_util::{AsyncWriteExt, StreamExt};
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 
 pub async fn download(
@@ -42,7 +42,7 @@ pub async fn download(
         file.write(&chunk_data).await?;
         bar.set_position(downloaded_length);
     }
-
+    file.close().await?;
     bar.finish_with_message(format!("File saved under {} 📦", &final_path.display()));
     Ok(())
 }
