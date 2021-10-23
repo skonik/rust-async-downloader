@@ -1,12 +1,14 @@
 use std::env::args;
+
 use async_std::fs::File;
 use async_std::io::WriteExt;
 use futures_util::StreamExt;
-use indicatif::{ProgressBar, ProgressStyle};
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 
 pub async fn download(
     url: &String,
     path: &std::path::PathBuf,
+    multi_progress: &MultiProgress,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let response = reqwest::get(url).await?;
 
@@ -21,10 +23,11 @@ pub async fn download(
     };
 
     let mut stream = response.bytes_stream();
-    println!("Saving file to: {}", &path.display());
 
     let mut file = File::create(format!("{}", &final_path.display())).await?;
-    let bar = ProgressBar::new(total_size);
+    let bar = multi_progress.add(ProgressBar::new(total_size));
+
+    bar.set_message(file_name.to_string());
 
     bar.set_style(ProgressStyle::default_bar()
         .template("{msg}\n{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({bytes_per_sec}, {eta})")

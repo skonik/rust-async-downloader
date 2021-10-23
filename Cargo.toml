@@ -9,7 +9,7 @@ edition = "2018"
 reqwest = { version = "0.11", features = ["blocking", "json", "stream"] }
 tokio = { version = "1", features = ["full"] }
 structopt = "0.3.13"
-indicatif = "0.16.2"
+indicatif = "0.17.0-beta.1"
 futures-util = "0.3.17"
 regex = "1"
 async-std = "1.10.0"
