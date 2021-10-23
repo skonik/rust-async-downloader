@@ -6,7 +6,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 
 pub async fn download(
     url: &String,
-    path: std::path::PathBuf,
+    path: &std::path::PathBuf,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let response = reqwest::get(url).await?;
 
