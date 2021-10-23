@@ -1,16 +1,23 @@
+use async_std::io::Cursor;
 use std::env::args;
 
 use async_std::fs::File;
 use async_std::io::WriteExt;
 use futures_util::{AsyncWriteExt, StreamExt};
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
+use reqwest::header::ACCEPT;
 
 pub async fn download(
     url: &String,
     path: &std::path::PathBuf,
     multi_progress: &MultiProgress,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let response = reqwest::get(url).await?;
+    let client = reqwest::Client::new();
+    let response = client
+        .get(url)
+        .header(ACCEPT, "application/pdf")
+        .send()
+        .await?;
 
     let file_name = url.split('/').next_back().unwrap();
     let final_path = path.join(file_name);
@@ -39,7 +46,8 @@ pub async fn download(
 
         downloaded_length = downloaded_length + (chunk_data.len() as u64);
 
-        file.write(&chunk_data).await?;
+        let mut content = Cursor::new(chunk_data);
+        async_std::io::copy(&mut content, &mut file).await?;
         bar.set_position(downloaded_length);
     }
     file.close().await?;
