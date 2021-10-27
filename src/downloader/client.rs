@@ -15,22 +15,24 @@ struct FileInfo {
     final_path: PathBuf,
 }
 
-fn get_url_info(url: &String, path: &PathBuf, response: &Response) -> FileInfo {
-    let file_name = url.split('/').next_back().unwrap();
-    let final_path = path.join(file_name);
+impl FileInfo {
+    fn new(url: &String, path: &PathBuf, response: &Response) -> Self {
+        let file_name = url.split('/').next_back().unwrap();
+        let final_path = path.join(file_name);
 
-    let total_size_option = response.content_length();
+        let total_size_option = response.content_length();
 
-    let total_size = match total_size_option {
-        Some(size) => size,
-        None => panic!("no response length!"),
-    };
+        let total_size = match total_size_option {
+            Some(size) => size,
+            None => panic!("no response length!"),
+        };
 
-    return FileInfo {
-        total_size: total_size,
-        file_name: file_name.to_string(),
-        final_path: final_path,
-    };
+        return FileInfo {
+            total_size: total_size,
+            file_name: file_name.to_string(),
+            final_path: final_path,
+        };
+    }
 }
 
 pub async fn download(
@@ -45,7 +47,7 @@ pub async fn download(
         .send()
         .await?;
 
-    let url_info = get_url_info(url, path, &response);
+    let url_info = FileInfo::new(url, path, &response);
 
     let mut stream = response.bytes_stream();
 
@@ -69,6 +71,9 @@ pub async fn download(
         bar.set_position(downloaded_length);
     }
     file.close().await?;
-    bar.finish_with_message(format!("File saved under {} 📦", url_info.final_path.display()));
+    bar.finish_with_message(format!(
+        "File saved under {} 📦",
+        url_info.final_path.display()
+    ));
     Ok(())
 }

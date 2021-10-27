@@ -7,10 +7,8 @@ use structopt::StructOpt;
 mod cli;
 mod downloader;
 
-
 async fn process_urls(urls: &Vec<String>, path: &std::path::PathBuf) {
     let multi_progress_bar = MultiProgress::new();
-
 
     let mut futures = Vec::new();
     for url in urls {
@@ -34,7 +32,6 @@ fn split_urls(urls: &String) -> Vec<String> {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = cli::args::Cli::from_args();
-
 
     let urls: Vec<String> = split_urls(&args.url);
 
