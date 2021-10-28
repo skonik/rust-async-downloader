@@ -32,6 +32,7 @@ fn split_urls(urls: &String) -> Vec<String> {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = cli::args::Cli::from_args();
+    println!("Arguments parsed: \n {}", args);
 
     let urls: Vec<String> = split_urls(&args.url);
 

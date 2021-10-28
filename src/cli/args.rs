@@ -34,3 +34,10 @@ pub struct Cli {
     #[structopt(parse(from_os_str))]
     pub path: std::path::PathBuf,
 }
+
+impl fmt::Display for Cli {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            let url: String = self.url.replace(",", "\n");
+        write!(f, "urls: \n{} \n path: {}", url, self.path.display())
+    }
+}
