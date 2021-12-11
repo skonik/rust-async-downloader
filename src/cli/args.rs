@@ -16,28 +16,16 @@ impl fmt::Debug for URLParsingError {
     }
 }
 
-fn validate_url(url: &str) -> Result<String, URLParsingError> {
-    let url_regex = Regex::new(r"^https?://.*$").unwrap();
-
-    let result = match url_regex.is_match(url) {
-        true => Ok(url.to_string()),
-        false => Err(URLParsingError),
-    };
-
-    return result;
-}
-
 #[derive(StructOpt)]
 pub struct Cli {
-    #[structopt(parse(try_from_str = validate_url))]
-    pub url: String,
     #[structopt(parse(from_os_str))]
-    pub path: std::path::PathBuf,
+    pub urls_file_path: std::path::PathBuf,
+    #[structopt(parse(from_os_str))]
+    pub result_dir_path: std::path::PathBuf,
 }
 
 impl fmt::Display for Cli {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            let url: String = self.url.replace(",", "\n");
-        write!(f, "urls: \n{} \n path: {}", url, self.path.display())
+        write!(f, "urls file: \n{} \n path: {}", self.urls_file_path.display(), self.result_dir_path.display())
     }
 }

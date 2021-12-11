@@ -1,6 +1,12 @@
-# rust-downloder
+# Rusty Download
 
-CLI program to asynchronously download files from specified url. Rust learning purpose
+<p align="center">
+  <img src="./img/rusty_downloader.png" height=432 width=396 />
+</p>
+
+
+CLI program to asynchronously download files from specified urls in file.
+
 
 ## Usage
 
