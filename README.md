@@ -10,10 +10,10 @@ CLI program to asynchronously download files from specified urls in file.
 
 ## Usage
 
-`$ cargo run https://www.softcover.io/download/88e295ad/GoBootcamp/ebooks/GoBootcamp.pdf "."`
+`$ cargo run <file_with_urls> <directory_to_save>`
 
-As a result content of the page will be saved under `go-book.pdf`.
+`$ cargo run ./urls.txt .`
 
-You can also set multiple urls with `,` as delimiter.
+Urls in the file must be separated by new line `\n`. All the files will saved in current directory()
 
 ![downloader_showcase.gif](./img/downloader_showcase.gif)
