@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use futures_util::future::join_all;
-use indicatif::{MultiProgress, ProgressBar};
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use structopt::StructOpt;
 use std::fs::File;
 use std::io::prelude::*;
@@ -9,19 +9,28 @@ mod cli;
 mod downloader;
 
 async fn process_urls(urls: &Vec<String>, path: &std::path::PathBuf) {
-    let multi_progress_bar = MultiProgress::new();
+    let progress_bar = ProgressBar::new(urls.len() as u64);
+    progress_bar.set_message("Downloading files progress");
+
+    progress_bar.set_style(ProgressStyle::default_bar()
+        .template("{msg}\n{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos:>7}/{len:7} ({per_sec}, {eta})")
+        .progress_chars("#>-"));
 
     let mut futures = Vec::new();
     for url in urls {
         futures.push(downloader::client::download(
             &url,
             &path,
-            &multi_progress_bar,
+            &progress_bar,
         ));
     }
 
     let joined_futures = join_all(futures);
     joined_futures.await;
+
+    progress_bar.finish_with_message(format!(
+        "Files are saved. 📦",
+    ));
 }
 
 fn split_into_urls(content: &String, delimiter: char) -> Vec<String> {

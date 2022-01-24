@@ -38,7 +38,7 @@ impl FileInfo {
 pub async fn download(
     url: &String,
     path: &std::path::PathBuf,
-    multi_progress: &MultiProgress,
+    progress_bar: &ProgressBar,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let client = reqwest::Client::new();
     let response = client
@@ -52,13 +52,8 @@ pub async fn download(
     let mut stream = response.bytes_stream();
 
     let mut file = File::create(format!("{}", url_info.final_path.display())).await?;
-    let bar = multi_progress.add(ProgressBar::new(url_info.total_size));
 
-    bar.set_message(url_info.file_name);
 
-    bar.set_style(ProgressStyle::default_bar()
-        .template("{msg}\n{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({bytes_per_sec}, {eta})")
-        .progress_chars("#>-"));
 
     let mut downloaded_length: u64 = 0;
     while let Some(chunk) = stream.next().await {
@@ -68,12 +63,9 @@ pub async fn download(
 
         let mut content = Cursor::new(chunk_data);
         async_std::io::copy(&mut content, &mut file).await?;
-        bar.set_position(downloaded_length);
     }
     file.close().await?;
-    bar.finish_with_message(format!(
-        "File saved under {} 📦",
-        url_info.final_path.display()
-    ));
+
+    progress_bar.inc(1);
     Ok(())
 }
