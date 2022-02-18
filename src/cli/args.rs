@@ -1,5 +1,5 @@
-use regex::Regex;
 use std::fmt;
+
 use structopt::StructOpt;
 
 struct URLParsingError;
@@ -25,7 +25,12 @@ pub struct Cli {
 }
 
 impl fmt::Display for Cli {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "urls file: \n{} \n path: {}", self.urls_file_path.display(), self.result_dir_path.display())
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "urls file: \n{} \n path: {}",
+            self.urls_file_path.display(),
+            self.result_dir_path.display()
+        )
     }
 }
