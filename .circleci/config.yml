@@ -1,0 +1,34 @@
+version: 2.1
+
+jobs:
+
+  lint:
+    docker:
+      - image: cimg/rust:1.58.1
+    steps:
+      - checkout
+      - run:
+          name: fmt check
+          command: cargo fmt --all -- --check
+      - run:
+          name: Clippy
+          command: cargo clippy -- -D warnings
+
+  test:
+    docker:
+      - image: cimg/rust:1.58.1
+    steps:
+      - checkout
+      - run: cargo --version
+      - run:
+          name: Check
+          command: "cargo check"
+      - run:
+          name: Test
+          command: "cargo test"
+
+workflows:
+  code-quality-worfklow:
+    jobs:
+      - lint
+      - test
