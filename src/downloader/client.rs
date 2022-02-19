@@ -1,12 +1,12 @@
+use std::io::Cursor;
 use std::path::{Path, PathBuf};
 
-use async_std::fs::File;
-use async_std::io::Cursor;
 use futures_util::future::join_all;
-use futures_util::{AsyncWriteExt, StreamExt};
+use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::header::ACCEPT;
 use reqwest::Response;
+use tokio::fs::File;
 
 struct FileInfo {
     final_path: PathBuf,
@@ -100,9 +100,8 @@ impl<'a> DownloaderClient<'a> {
             let chunk_data = chunk.unwrap();
 
             let mut content = Cursor::new(chunk_data);
-            async_std::io::copy(&mut content, &mut file).await?;
+            tokio::io::copy(&mut content, &mut file).await?;
         }
-        file.close().await?;
 
         match self.silent {
             true => {}
