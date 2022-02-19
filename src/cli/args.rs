@@ -17,11 +17,17 @@ impl fmt::Debug for URLParsingError {
 }
 
 #[derive(StructOpt)]
+#[structopt(
+    name = "Rusty Downloader",
+    about = "Asynchronously download multiple files."
+)]
 pub struct Cli {
-    #[structopt(parse(from_os_str))]
+    #[structopt(parse(from_os_str), short = "u", long = "urls")]
     pub urls_file_path: std::path::PathBuf,
-    #[structopt(parse(from_os_str))]
+    #[structopt(parse(from_os_str), short = "d", long = "destination")]
     pub result_dir_path: std::path::PathBuf,
+    #[structopt(short = "s", long = "silent")]
+    pub silent: bool,
 }
 
 impl fmt::Display for Cli {
